@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Fire Alarm Monitor</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Add Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -130,6 +130,9 @@
             --text-secondary: #ffcccc;
             --border-radius: 8px;
             --transition: all 0.3s ease;
+            --font-display: 'Orbitron', sans-serif;
+            --font-primary: 'Rajdhani', sans-serif;
+            --font-secondary: 'Roboto', sans-serif;
         }
 
         @keyframes fireBackground {
@@ -144,7 +147,7 @@
         }
 
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: var(--font-primary);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -155,6 +158,76 @@
             line-height: 1.5;
             position: relative;
             padding: 1rem;
+        }
+
+        h1, h2, .status {
+            font-family: var(--font-display);
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 800;
+            background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+
+        h2 {
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            font-weight: 700;
+            margin: 0 0 1rem 0;
+        }
+
+        .status {
+            font-size: clamp(1rem, 3vw, 1.25rem);
+            font-weight: 700;
+            letter-spacing: 0.1em;
+        }
+
+        input {
+            font-family: var(--font-secondary);
+            font-size: 1rem;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+        }
+
+        button {
+            font-family: var(--font-display);
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .balance-item p:first-child {
+            font-family: var(--font-display);
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .balance-item p:last-child {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+        }
+
+        .history p {
+            font-family: var(--font-secondary);
+            font-size: 0.95rem;
+            letter-spacing: 0.02em;
+            line-height: 1.5;
+        }
+
+        #updateMessage {
+            font-family: var(--font-secondary);
+            font-size: 0.9rem;
+            letter-spacing: 0.02em;
         }
 
         .container {
@@ -542,15 +615,15 @@
             0%, 100% { 
                 text-shadow: 
                     0 0 10px var(--primary-color),
-                    0 0 20px var(--primary-color),
-                    0 0 30px var(--primary-color);
+                    0 0 20px var(--primary-color);
+                letter-spacing: 0.05em;
             }
             50% { 
                 text-shadow: 
                     0 0 20px var(--primary-color),
                     0 0 30px var(--primary-color),
-                    0 0 40px var(--primary-color),
-                    0 0 50px var(--primary-color);
+                    0 0 40px var(--primary-color);
+                letter-spacing: 0.08em;
             }
         }
 
