@@ -34,20 +34,34 @@ def update_phone():
 		return jsonify({'error': 'Arduino not connected'}), 400
 	
 	data = request.get_json()
-	if not data or 'phone' not in data:
-		return jsonify({'error': 'Phone number required'}), 400
+	if not data or ('phone1' not in data and 'phone2' not in data):
+		return jsonify({'error': 'At least one phone number required'}), 400
 	
-	phone = data['phone']
-	# Validate phone number format (basic validation)
-	if not phone.startswith('+') or not phone[1:].isdigit():
-		return jsonify({'error': 'Invalid phone number format'}), 400
+	response = {}
 	
-	try:
-		arduino.write(f'PHONE:{phone}\n'.encode())
-		response = arduino.readline().decode('utf-8').strip()
-		return jsonify(json.loads(response))
-	except Exception as e:
-		return jsonify({'error': str(e)}), 500
+	if 'phone1' in data:
+		phone1 = data['phone1']
+		if not phone1.startswith('+') or not phone1[1:].isdigit():
+			return jsonify({'error': 'Invalid primary phone number format'}), 400
+		try:
+			arduino.write(f'PHONE1:{phone1}\n'.encode())
+			response_line = arduino.readline().decode('utf-8').strip()
+			response['phone1'] = json.loads(response_line)
+		except Exception as e:
+			return jsonify({'error': f'Error updating primary number: {str(e)}'}), 500
+	
+	if 'phone2' in data:
+		phone2 = data['phone2']
+		if not phone2.startswith('+') or not phone2[1:].isdigit():
+			return jsonify({'error': 'Invalid secondary phone number format'}), 400
+		try:
+			arduino.write(f'PHONE2:{phone2}\n'.encode())
+			response_line = arduino.readline().decode('utf-8').strip()
+			response['phone2'] = json.loads(response_line)
+		except Exception as e:
+			return jsonify({'error': f'Error updating secondary number: {str(e)}'}), 500
+	
+	return jsonify(response)
 
 @app.route('/api/status')
 def get_status():

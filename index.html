@@ -726,9 +726,15 @@
         <div class="glow"></div>
     </div>
     <div class="container max-w-4xl w-full">
-        <div class="header flex items-center gap-4 mb-8 pb-4 border-b-2 border-primary">
-            <i class="fas fa-fire-extinguisher text-4xl text-primary"></i>
-            <h1 class="text-3xl font-black text-white tracking-wider">Fire Alarm</h1>
+        <div class="header flex flex-col items-center gap-2 mb-8 pb-4 border-b-2 border-primary">
+            <div class="flex flex-col items-center gap-2">
+                <div class="flex items-center gap-4">
+                    <i class="fas fa-fire-extinguisher text-4xl text-primary"></i>
+                    <h1 class="text-3xl font-black text-white tracking-wider">Fire and Gas Prevention System</h1>
+                </div>
+                <h1 class="text-3xl font-black text-white tracking-wider">(FGPS)</h1>
+            </div>
+            <p class="text-primary-light text-sm italic tracking-wide">Prevent the spark, Protect what you love</p>
         </div>
 
         <div id="status" class="status safe">
@@ -738,20 +744,37 @@
         
         <div class="card">
             <h2 class="flex items-center gap-2 text-xl mb-4 text-white">
-                <i class="fas fa-phone"></i>Phone Number
+                <i class="fas fa-phone"></i>Emergency Contact Numbers
             </h2>
-            <form id="phoneForm" onsubmit="updatePhoneNumber(event)">
-                <div class="flex gap-4 justify-center">
-                    <input 
-                        type="text" 
-                        id="phoneInput" 
-                        placeholder="+639XXXXXXXXX" 
-                        pattern="\+[0-9]+" 
-                        required
-                        class="flex-1 max-w-md"
-                    >
+            <form id="phoneForm" onsubmit="updatePhoneNumbers(event)" class="space-y-4">
+                <div class="space-y-2">
+                    <label class="text-primary-light text-sm">Primary Contact</label>
+                    <div class="flex gap-4">
+                        <input 
+                            type="text" 
+                            id="phoneInput1" 
+                            placeholder="+639XXXXXXXXX" 
+                            pattern="\+[0-9]+" 
+                            required
+                            class="flex-1 max-w-md"
+                        >
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-primary-light text-sm">Secondary Contact (Optional)</label>
+                    <div class="flex gap-4">
+                        <input 
+                            type="text" 
+                            id="phoneInput2" 
+                            placeholder="+639XXXXXXXXX" 
+                            pattern="\+[0-9]+" 
+                            class="flex-1 max-w-md"
+                        >
+                    </div>
+                </div>
+                <div class="flex justify-end">
                     <button type="submit" class="flex items-center gap-2">
-                        <i class="fas fa-save"></i> Update
+                        <i class="fas fa-save"></i> Update Numbers
                     </button>
                 </div>
             </form>
@@ -814,11 +837,19 @@
             }
         }
 
-        async function updatePhoneNumber(event) {
+        async function updatePhoneNumbers(event) {
             event.preventDefault();
-            const phoneInput = document.getElementById('phoneInput');
+            const phoneInput1 = document.getElementById('phoneInput1');
+            const phoneInput2 = document.getElementById('phoneInput2');
             const updateMessage = document.getElementById('updateMessage');
-            const phone = phoneInput.value;
+            
+            const data = {
+                phone1: phoneInput1.value
+            };
+            
+            if (phoneInput2.value) {
+                data.phone2 = phoneInput2.value;
+            }
 
             try {
                 const response = await fetch('http://localhost:5000/api/phone', {
@@ -826,17 +857,21 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ phone: phone })
+                    body: JSON.stringify(data)
                 });
 
-                const data = await response.json();
+                const responseData = await response.json();
                 
                 if (response.ok) {
                     updateMessage.style.color = 'var(--success-color)';
-                    updateMessage.textContent = `Phone number updated successfully to ${data.phone_updated}`;
+                    let message = `Primary number updated successfully`;
+                    if (data.phone2) {
+                        message += ` and secondary number updated successfully`;
+                    }
+                    updateMessage.textContent = message;
                 } else {
                     updateMessage.style.color = 'var(--danger-color)';
-                    updateMessage.textContent = data.error || 'Failed to update phone number';
+                    updateMessage.textContent = responseData.error || 'Failed to update phone numbers';
                 }
             } catch (error) {
                 updateMessage.style.color = 'var(--danger-color)';

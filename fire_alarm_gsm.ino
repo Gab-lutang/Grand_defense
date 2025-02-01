@@ -1,7 +1,8 @@
 #include <SoftwareSerial.h>
 
 SoftwareSerial myGSM(9, 10); // TX - RX
-String phoneNumber = "+639618084684"; // Default phone number
+String phoneNumber1 = "+639618084684"; // Primary phone number
+String phoneNumber2 = ""; // Secondary phone number
 unsigned long lastLoadCheck = 0;
 const unsigned long LOAD_CHECK_INTERVAL = 60000; // Check load every 1 minute
 int smsBalance = 0; // Store SMS balance
@@ -29,9 +30,13 @@ void loop()
 	// Check if there's a new phone number command
 	if (Serial.available() > 0) {
 		String command = Serial.readStringUntil('\n');
-		if (command.startsWith("PHONE:")) {
-			phoneNumber = command.substring(6);
-			Serial.println("{\"phone_updated\":\"" + phoneNumber + "\"}");
+		if (command.startsWith("PHONE1:")) {
+			phoneNumber1 = command.substring(7);
+			Serial.println("{\"phone_updated\":\"" + phoneNumber1 + "\",\"type\":\"primary\"}");
+		}
+		else if (command.startsWith("PHONE2:")) {
+			phoneNumber2 = command.substring(7);
+			Serial.println("{\"phone_updated\":\"" + phoneNumber2 + "\",\"type\":\"secondary\"}");
 		}
 	}
 
@@ -93,18 +98,44 @@ void DeactivateBuzzer()
 
 void MakeCall()
 {
-	myGSM.println("ATD" + phoneNumber + ";");
+	// Call primary number
+	myGSM.println("ATD" + phoneNumber1 + ";");
 	delay(100);
-	myGSM.println("Calling");
+	myGSM.println("Calling primary");
 	delay(100);
+	
+	// If secondary number exists, call it too
+	if (phoneNumber2.length() > 0) {
+		delay(1000); // Wait a bit between calls
+		myGSM.println("ATD" + phoneNumber2 + ";");
+		delay(100);
+		myGSM.println("Calling secondary");
+		delay(100);
+	}
 }
 
 void SendMessage(String type)
 {
+	// Send to primary number
 	myGSM.println("AT+CMGF=1");
 	delay(100);
-	myGSM.println("AT+CMGS=\"" + phoneNumber + "\"\r");
+	myGSM.println("AT+CMGS=\"" + phoneNumber1 + "\"\r");
 	delay(100);
+	SendMessageContent(type);
+	
+	// If secondary number exists, send to it too
+	if (phoneNumber2.length() > 0) {
+		delay(1000); // Wait a bit between messages
+		myGSM.println("AT+CMGF=1");
+		delay(100);
+		myGSM.println("AT+CMGS=\"" + phoneNumber2 + "\"\r");
+		delay(100);
+		SendMessageContent(type);
+	}
+}
+
+void SendMessageContent(String type)
+{
 	if (type == "FIRE") {
 		myGSM.println("FIRE IS DETECTED!");
 	} else if (type == "GAS") {
